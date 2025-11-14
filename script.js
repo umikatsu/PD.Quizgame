@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentQuizIndex = 0;
     let score = 0;
     let shuffledQuizzes = []; 
-    // クイズ数は10問に戻します
     const QUIZ_COUNT = 10; 
 
     const quizStartScreen = document.getElementById('quiz-start-screen');
@@ -65,8 +64,8 @@ const quizzes = [
     {question: "水害発生時、山へ逃げるために車を使い避難行動することは〇か×か？", choices: ["〇（適切）", "×（不適切）"], answer: "×（不適切）", explanation: "災害時車を利用すると渋滞や事故の元になり、緊急車両の通行が困難になる恐れがあります。また、水害では30cm浸かる状態でエンジンが停止してしまい避難行動すらできなくなるため不適切です。", image: null},
     {question: "家屋が被災した時にすぐに確認すべき、火災・爆発の危険がある重要な項目はどれか？", choices: ["被害状況を写真で記録すること", "ブレーカーとガスの安全確認", "避難所への場所の確認", "近隣住民の安否確認"], answer: "ブレーカーとガスの安全確認", explanation: "特にブレーカー（電気）やガスに異常があると発火や爆発の恐れがあるため、迅速に安全確認を行う必要があります。", image: null},
     
-    // 💡 ブレーカー問題の修正: 選択肢を並び替えパターンに変更
-    {question: "電気を復旧させるときの手順として正しい並び替えはどれか？ (画像参照)\n\n<small>手順の項目は以下の通りです。</small>\n<small style='font-size: 0.9em; line-height: 1.5;'>\n1. 安全ブレーカーを一つずつONにする<br>\n2. アンペアブレーカーを入れる<br>\n3. 漏電遮断器をONにする<br>\n4. ブレーカーが全てOFFになっているか確認する\n</small>",
+    // 💡 ブレーカー問題の修正: 問題文から手順リストのテキストを完全に削除
+    {question: "電気を復旧させるときの手順として正しい並び替えはどれか？ (画像参照)", 
       choices: [
           "4→2→3→1", // 正解
           "2→3→1→4", 
@@ -272,7 +271,7 @@ const quizzes = [
     
     /**
      * 知識クイズの表示ロジック
-     * 選択肢のテキストの前に、自動でインデックス番号を付与しないように修正
+     * 💡 修正: 問題文のHTML表示を維持しつつ、自動番号付与は行わない
      */
     function displayQuiz() {
         resultMessage.textContent = "";
@@ -283,8 +282,9 @@ const quizzes = [
         }
         const currentQuiz = shuffledQuizzes[currentQuizIndex]; 
         
-        // 問題文を表示（ブレーカーの問題では、問題文に手順リストが入っている）
-        questionElement.textContent = currentQuiz.question; 
+        // 問題文を表示（HTMLタグを正しく解釈させるため innerHTML を使用）
+        // \nを<br>に変換してからHTMLとして挿入
+        questionElement.innerHTML = currentQuiz.question.replace(/\n/g, '<br>'); 
         
         if (currentQuiz.image) {
             quizImage.src = currentQuiz.image;
@@ -317,8 +317,6 @@ const quizzes = [
 
     /**
      * 知識クイズの回答チェックロジック
-     * 選択肢のテキスト（selectedChoice）をそのまま正解（correctAnswer）と比較します。
-     * （回答選択肢に余計な番号が付与されていないことを前提とします）
      */
     function checkAnswer(selectedButton, selectedChoice, correctAnswer) {
         const buttons = choicesContainer.querySelectorAll('.choice-button');
