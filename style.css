@@ -1,0 +1,360 @@
+/* ================================== */
+/* 1. テーマカラーと基本設定 */
+/* ================================== */
+:root {
+    --color-primary: #1E88E5; /* 青 */
+    --color-success: #4CAF50; /* 緑 */
+    --color-error: #F44336; /* 赤 */
+    --color-text: #333; /* 昼間の標準文字色 */
+    --color-background: #0A1A2F; /* 夜間背景ベース色 */
+    --color-white: #FFFFFF; /* 白 */
+    --color-quiz-green: #38c172; /* スタートボタンの色 */
+    --p-background-color: #f0f8ff; /* 診断結果の背景色 */
+    --p-primary-color: var(--color-primary);
+    --p-success-color: var(--color-success);
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+body {
+    /* デフォルトは夜間モード */
+    background: linear-gradient(to bottom, #0A1A2F 0%, #003366 70%, #001A33 100%);
+    color: var(--color-text);
+    position: relative;
+    transition: background 1s ease;
+}
+
+/* ================================== */
+/* 2. 背景アニメーション (夜間モード) */
+/* ================================== */
+.ocean {
+    position: absolute; bottom: 0; left: 0; width: 200%; height: 25%;
+    background: rgba(0, 60, 120, 0.9);
+    border-top: 3px solid rgba(255, 255, 255, 0.2);
+    animation: waveMove 6s infinite linear;
+    transform: translateX(-25%); z-index: 1;
+}
+.ocean::before, .ocean::after {
+    content: ""; position: absolute; top: -20px; left: 0; width: 200%; height: 100%;
+    background: rgba(0, 90, 180, 0.4); border-top: 2px solid rgba(255, 255, 255, 0.2);
+    animation: waveMove 8s infinite linear reverse;
+}
+@keyframes waveMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.city {
+    position: absolute; bottom: 25%; left: 0; width: 100%; height: 20%;
+    background: repeating-linear-gradient(to right, #111 0 40px, #222 40px 60px, #111 60px 120px);
+    clip-path: polygon(0% 100%, 0% 70%, 5% 60%, 10% 70%, 15% 55%, 20% 75%, 25% 50%, 30% 70%, 35% 60%, 40% 75%, 45% 55%, 50% 70%, 55% 60%, 60% 75%, 65% 55%, 70% 70%, 75% 60%, 80% 75%, 85% 50%, 90% 70%, 95% 55%, 100% 70%, 100% 100%);
+    z-index: 2;
+}
+
+.lightning {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.8), transparent 70%);
+    opacity: 0; animation: lightningFlash 5s infinite;
+    pointer-events: none; z-index: 3;
+}
+@keyframes lightningFlash { 0%, 90%, 100% { opacity: 0; } 2%, 3%, 5% { opacity: 1; } 40%, 41% { opacity: 0.8; } 65%, 66% { opacity: 0.9; } }
+.lightning::after {
+    content: ""; position: absolute; top: 0; left: 50%; width: 8px; height: 100%;
+    background: transparent; border-right: 5px solid white; opacity: 0; box-shadow: 0 0 30px 5px #ffcc00;
+    clip-path: polygon(50% 0%, 0% 10%, 100% 20%, 0% 30%, 100% 40%, 0% 50%, 100% 60%, 0% 70%, 100% 80%, 0% 90%, 50% 100%);
+    transform: translateX(-50%); animation: boltStrike 5s infinite;
+}
+@keyframes boltStrike { 0%, 90%, 100% { opacity: 0; height: 0; } 2% { opacity: 1; height: 70%; } 3% { opacity: 0; } 40% { opacity: 1; height: 100%; } 41% { opacity: 0; } 65% { opacity: 1; height: 85%; } 66% { opacity: 0; } }
+
+
+/* ================================== */
+/* 3. リアルタイムテーマ (昼間モード) */
+/* ================================== */
+body.light-theme {
+    /* 昼間の背景色 (明るい青空) */
+    background: linear-gradient(to bottom, #B3E5FC 0%, #E1F5FE 70%, #FFFFFF 100%);
+    color: var(--color-text);
+}
+
+/* Light Mode: 夜間背景要素を非表示 */
+body.light-theme .lightning,
+body.light-theme .ocean {
+    display: none !important;
+}
+
+body.light-theme .city {
+    /* 昼間は街並みが明るく見える */
+    bottom: 0;
+    height: 30%;
+    background: repeating-linear-gradient(to right, #AAA 0 40px, #CCC 40px 60px, #AAA 60px 120px);
+    z-index: 1;
+}
+
+/* Light Mode: ボタン調整 */
+body.light-theme .navigation-button {
+    /* ナビゲーションボタンの背景色（昼間） */
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+body.light-theme .navigation-button:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+
+/* ================================== */
+/* 4. UI共通スタイル */
+/* ================================== */
+.full-screen-ui {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    /* ★ 修正: 中央寄せに戻す */
+    justify-content: center; 
+
+    min-height: 100vh; text-align: center; padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* クリック遮断防止のためz-indexを高く設定 */
+    z-index: 10;
+}
+.hidden {
+    display: none !important;
+}
+
+/* --- 文字色とエフェクト --- */
+
+/* ホーム/選択画面の文字色 (昼夜問わず白色を強制) */
+#top-screen *,
+#selection-screen *,
+#quiz-mode-selection-screen * {
+    color: var(--color-white) !important;
+}
+
+/* 夜間テーマ時の文字エフェクト (Default) */
+body:not(.light-theme) #top-screen *,
+body:not(.light-theme) #selection-screen *,
+body:not(.light-theme) #quiz-mode-selection-screen * {
+    text-shadow: 0 0 10px #00f, 0 0 20px #00f; /* 夜間のみネオン */
+}
+body:not(.light-theme) #top-screen h1 {
+    text-shadow: 0 0 15px #00f, 0 0 30px #00f, 0 0 45px #00f; /* 夜間のみネオン */
+}
+
+/* 昼間テーマ時の文字エフェクトの無効化 */
+body.light-theme #top-screen *,
+body.light-theme #selection-screen *,
+body.light-theme #quiz-mode-selection-screen * {
+    text-shadow: none !important; /* 昼間はネオンエフェクトを無効化 */
+}
+
+#top-screen h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+}
+
+/* --- ボタン基本スタイル --- */
+.action-button {
+    background-color: var(--color-primary); color: var(--color-white);
+    border: none; border-radius: 8px; padding: 15px 30px;
+    cursor: pointer; font-size: 1.2em; font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s; margin: 5px;
+}
+.action-button:hover:not(:disabled) {
+    filter: brightness(0.9); transform: translateY(-2px);
+}
+.action-button:disabled {
+    cursor: not-allowed; opacity: 0.6;
+}
+
+/* --- ナビゲーションと時刻表示の修正 --- */
+
+/* 汎用的なナビゲーションボタン - 左上に固定 */
+.navigation-button {
+    color: var(--color-white) !important;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 20px; cursor: pointer; font-size: 1em;
+    position: fixed;
+    transition: background-color 0.2s; 
+    z-index: 15; 
+}
+.navigation-button:hover { background: rgba(255, 255, 255, 0.3); }
+
+/* 配置調整: すべてのナビゲーションボタンを左上に固定 */
+#back-to-selection-top-button,
+#back-from-quiz-mode-button,
+#back-to-mode-selection-button,
+#back-from-quiz-selection-button,
+#back-from-personality-button {
+    top: 20px;
+    left: 20px;
+    right: auto;
+}
+
+/* リアルタイム時刻表示 - 右上に固定 */
+#current-time-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 15; 
+    color: var(--color-white) !important;
+    background: rgba(255, 255, 255, 0.2);
+}
+/* 昼間調整 (背景色のみ調整) */
+body.light-theme #current-time-display {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+
+/* ================================== */
+/* 5. クイズ/診断モード UI */
+/* ================================== */
+
+/* クイズ/診断のカード共通スタイル (quiz-screen) - スクロール問題対策 */
+.quiz-screen {
+    width: 90%; max-width: 600px;
+    /* max-heightを調整 */
+    max-height: 85vh; 
+    overflow-y: auto; 
+
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--color-text); 
+    padding: 20px 30px 30px; 
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    text-align: center; backdrop-filter: blur(5px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* ★ 修正: カード内のコンテンツも中央寄せに戻す */
+    justify-content: center; 
+    
+    margin-top: 0; 
+    margin-bottom: 0;
+}
+
+/* 問題文 (h2) のマージンを調整 */
+#quiz-container h2 {
+    margin-top: 10px; 
+    margin-bottom: 5px; 
+}
+
+/* 複数画像コンテナのスタイル (画像を詰めて表示) */
+#quiz-image-group {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    gap: 5px; 
+    margin-bottom: 10px; 
+    /* 最大高さをコンパクトにする */
+    max-height: 250px; 
+}
+
+/* クイズ画像スタイル */
+.quiz-visual {
+    max-width: 100%;
+    /* ★ 修正: 各画像の最大高さを再調整 */
+    max-height: 100px; 
+    width: auto;
+    object-fit: contain;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+}
+
+/* 選択肢のレイアウト */
+#choices-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 知識クイズは2x2グリッド */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+#p-options-container {
+    display: grid;
+    grid-template-columns: 1fr; /* 性格診断は横一列 */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* --- 診断モード専用スタイル --- */
+.p-question-number {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+/* 診断の選択済みボタン（SELECTED） */
+.option-button.selected {
+    background-color: var(--p-success-color);
+    border-color: var(--p-success-color);
+    transform: scale(1.02);
+}
+
+/* 診断の非選択ボタン（トーンダウン） */
+.option-button:disabled:not(.selected) {
+    opacity: 0.4;
+    cursor: default;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #dee2e6;
+}
+
+/* 診断結果のボックス */
+#p-result-text {
+    padding: 25px;
+    border: 3px dashed var(--p-primary-color);
+    border-radius: 10px;
+    background-color: var(--p-background-color);
+    margin: 20px 0;
+    white-space: pre-wrap;
+    text-align: left;
+    line-height: 1.8;
+}
+
+/* スタート/リトライボタンの色を緑に */
+#start-quiz-button, #retry-quiz-button, #start-personality-button, #p-restart-button {
+    background-color: var(--color-quiz-green);
+}
+#start-quiz-button:hover, #retry-quiz-button:hover, #start-personality-button:hover, #p-restart-button:hover {
+    background-color: #2ca05f;
+}
+
+/* ゲームをやめるボタンのスタイル */
+#quit-game-button, #p-quit-button {
+    background-color: #78909C;
+    margin-top: 10px;
+}
+#quit-game-button:hover, #p-quit-button:hover {
+    background-color: #546E7A;
+}
+
+/* クイズの正解/不正解フィードバック */
+.choice-button.correct {
+    background-color: var(--color-success);
+    color: var(--color-white);
+}
+
+.choice-button.incorrect {
+    background-color: var(--color-error);
+    color: var(--color-white);
+    opacity: 0.8;
+}
+
+.feedback-box {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    line-height: 1.6;
+    font-weight: bold;
+    color: var(--color-text);
+}
