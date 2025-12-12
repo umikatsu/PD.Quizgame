@@ -1,0 +1,230 @@
+/* リセットと基本設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f8f8;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #0056b3; /* 金沢市の伝統色や水害対策を意識した青 */
+}
+
+h1 { font-size: 2.5em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.6em; }
+h4 { font-size: 1.2em; }
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 40px 0;
+}
+
+/* --- ボタン共通スタイル --- */
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+}
+
+.primary-button {
+    background-color: #ff5722; /* 目立つオレンジ（緊急性） */
+    color: white;
+    font-size: 1.1em;
+    border: 2px solid #ff5722;
+}
+
+.primary-button:hover {
+    background-color: #e64a19;
+}
+
+/* --- ヒーローセクション (一番上の目立つ部分) --- */
+.hero {
+    background-color: #e0f7fa; /* 薄い水色 */
+    text-align: center;
+    padding: 80px 0;
+    border-bottom: 5px solid #00acc1;
+}
+
+.hero h1 {
+    color: #0056b3;
+    font-size: 3em;
+    margin-bottom: 5px;
+}
+
+.hero h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.hero .catchphrase {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+/* --- 機能セクション --- */
+.features-section {
+    padding: 40px 0;
+    background-color: white;
+}
+
+.features-section h3 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 40px;
+}
+
+.feature-card {
+    background-color: #f4f4f4;
+    border-left: 5px solid #ff5722;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.feature-card h4 {
+    color: #ff5722;
+    margin-top: 0;
+}
+
+/* --- その他の機能セクション --- */
+.sub-features-section {
+    padding: 40px 0;
+}
+
+.sub-features-section ul {
+    list-style: none;
+    padding-left: 0;
+    display: grid;
+    gap: 15px;
+}
+
+.sub-features-section li {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #00acc1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* --- ダウンロードセクション --- */
+.download-section {
+    background-color: #e0f7fa;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.download-section h3 {
+    color: #0056b3;
+    margin-bottom: 30px;
+}
+
+.download-links {
+    margin: 30px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.download-button {
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 250px;
+    padding: 15px 20px;
+}
+
+.download-button .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.appstore {
+    background-color: #007aff;
+    color: white;
+}
+
+.appstore:hover {
+    background-color: #0060c5;
+}
+
+.googleplay {
+    background-color: #00c853;
+    color: white;
+}
+
+.googleplay:hover {
+    background-color: #00a044;
+}
+
+.note {
+    background-color: #fff9c4; /* 警告色に近い薄い黄色 */
+    border-left: 5px solid #ffd600;
+    padding: 15px;
+    margin-top: 40px;
+    display: inline-block;
+    max-width: 600px;
+    text-align: left;
+    border-radius: 5px;
+}
+
+/* --- フッター --- */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.9em;
+}
+
+/* --- レスポンシブ対応 (スマートフォン用) --- */
+@media (max-width: 768px) {
+    .hero {
+        padding: 50px 0;
+    }
+    
+    .hero h1 {
+        font-size: 2em;
+    }
+    
+    .download-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .download-button {
+        width: 80%; /* スマホでは幅を広く取る */
+        max-width: 300px;
+    }
+}
