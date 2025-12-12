@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // I. 終了ボタン（共通）
-    const EXIT_URL = "https://www.pref.ishikawa.lg.jp/bousai/h_map.html"; // 宣伝URL
+    const EXIT_URL = "https://umikatsu.github.io/PD.Quizgame/advertise.html"; // 宣伝URL
     [quitGameButton, pQuitButton].forEach(btn => {
         if(btn) {
             btn.addEventListener('click', () => {
@@ -508,4 +508,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
 
