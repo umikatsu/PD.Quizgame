@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const startPersonalityBtn = document.getElementById("start-personality-button");
     const pRestartButton = document.getElementById("p-restart-button");
     const pQuitButton = document.getElementById("p-quit-button");
+    const backFromGameBtn = document.getElementById("back-from-game-button");
+    const btnFinish = document.getElementById('btn-finish');
+    const btnRetry = document.getElementById('btn-retry');
+    const overlayRetryBtn = document.getElementById('overlay-retry-button');
+    const overlayQuitBtn = document.getElementById('overlay-quit-button');
 
 
     /* ================================== */
@@ -208,6 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
             hideAllScreens();
             quizModeSelectionScreen.classList.remove("hidden");
         });
+    if (modeGameBtn) {
+        modeGameBtn.addEventListener("click", () => {
+            hideAllScreens();
+            gameContainer.classList.remove("hidden");
+            setTimeout(() => { initGameMap(); }, 100);
+        });
+    }
 
     // D. クイズ/診断選択画面 -> メイン選択画面
     if (backFromQuizSelectionBtn)
@@ -243,7 +255,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
-
+    if(backFromGameBtn) {
+        backFromGameBtn.addEventListener("click", () => {
+            stopGameMap(); // タイマー停止
+            hideAllScreens();
+            selectionScreen.classList.remove("hidden");
+        });
+    }
     // H. 知識クイズの結果画面からモード選択に戻る (クイズ/診断選択画面へ)
     if(backToModeSelectionBtn)
         backToModeSelectionBtn.addEventListener('click', () => {
@@ -512,7 +530,241 @@ document.addEventListener("DOMContentLoaded", () => {
             pResultText.textContent = `診断結果が見つかりませんでした。（合計スコア: ${totalPScore}点）`;
         }
     }
+    /* ================================== */
+    /* VIII. マップゲーム ロジック (新規追加) */
+    /* ================================== */
+    let map = null;
+    let startPoint, goalPoint;
+    let dangerPolygons = [];
+    let userWaypoints = [];
+    let userRouteControl = null;
+    let timerInterval = null;
+    let timeLeft = 180;
+    let isGoalReady = false;
+
+    // 避難所データ
+    const shelters = [
+        { name: "金沢市役所", lat: 36.5611, lng: 136.6566 },
+        { name: "泉野小学校", lat: 36.5480, lng: 136.6450 },
+        { name: "明成小学校", lat: 36.5790, lng: 136.6500 },
+        { name: "兼六中学校", lat: 36.5550, lng: 136.6700 },
+        { name: "犀川小学校", lat: 36.5400, lng: 136.6600 },
+        { name: "金沢駅", lat: 36.5780, lng: 136.6480 }
+    ];
+    // 出現範囲
+    const AREA = { minLat: 36.530, maxLat: 36.600, minLng: 136.620, maxLng: 136.680 };
+
+    // ゲーム初期化
+    function initGameMap() {
+        if (!map) {
+            map = L.map('map').setView([36.56, 136.65], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+            map.on('click', onMapClick);
+        } else {
+            map.invalidateSize(); // 再表示時の崩れ防止
+        }
+        resetGameState();
+    }
+
+    // ゲーム停止（戻るボタン用）
+    function stopGameMap() {
+        clearInterval(timerInterval);
+    }
+
+    // 状態リセット
+    function resetGameState() {
+        document.getElementById('result-overlay').style.display = 'none';
+        
+        // 地図上の要素を全削除
+        map.eachLayer(l => {
+            if(l instanceof L.Marker || l instanceof L.Polygon || l instanceof L.CircleMarker) map.removeLayer(l);
+        });
+        if(userRouteControl) map.removeControl(userRouteControl);
+
+        userWaypoints = []; dangerPolygons = []; isGoalReady = false;
+        
+        btnFinish.classList.remove('active'); 
+        btnFinish.textContent = "ルート作成中...";
+        document.getElementById('status-text').innerHTML = "地図をクリックしてルートを作成。<br>ゴールにつなげてください。";
+
+        clearInterval(timerInterval); 
+        timeLeft = 180; 
+        updateTimer();
+
+        setupStartGoal();
+        
+        // スタート・ゴールが決まったら危険区域生成
+        if(startPoint && goalPoint) {
+            generateSafeDangerZones(startPoint, goalPoint);
+            map.fitBounds([[startPoint.lat, startPoint.lng], [goalPoint.lat, goalPoint.lng]], {padding:[80,80]});
+            
+            // スタート地点をルートの起点に
+            userWaypoints.push(L.latLng(startPoint.lat, startPoint.lng));
+            drawUserRoute();
+            
+            // タイマースタート
+            timerInterval = setInterval(() => {
+                timeLeft--; updateTimer();
+                if(timeLeft <= 0) showGameResult("TIME OVER", "逃げ遅れました...", false);
+            }, 1000);
+        }
+    }
+
+    // スタート・ゴール地点の決定
+    function setupStartGoal() {
+        let found = false;
+        const startIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="text-align:center;"><div class="pin-label" style="color:#c0392b;border-color:#c0392b;">現在地</div><div style="font-size:30px;">🏃</div></div>`,
+            iconSize: [30, 40], iconAnchor: [15, 30]
+        });
+        const goalIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="text-align:center;"><div class="pin-label" style="color:#27ae60;border-color:#27ae60;">避難所</div><div style="font-size:30px;">🏫</div></div>`,
+            iconSize: [30, 40], iconAnchor: [15, 30]
+        });
+
+        for(let i=0; i<100; i++){
+            const tLat = Math.random() * (AREA.maxLat - AREA.minLat) + AREA.minLat;
+            const tLng = Math.random() * (AREA.maxLng - AREA.minLng) + AREA.minLng;
+            const candidates = shelters.filter(s => {
+                const d = getDist(tLat, tLng, s.lat, s.lng);
+                return d >= 0.8 && d <= 2.5; // 0.8km〜2.5kmの範囲
+            });
+            if(candidates.length > 0){
+                startPoint = {lat:tLat, lng:tLng};
+                goalPoint = candidates[Math.floor(Math.random()*candidates.length)];
+                found = true; break;
+            }
+        }
+        if(!found) { setTimeout(resetGameState, 100); return; }
+
+        L.marker([startPoint.lat, startPoint.lng], {icon: startIcon}).addTo(map);
+        L.marker([goalPoint.lat, goalPoint.lng], {icon: goalIcon}).addTo(map);
+    }
+
+    // 危険区域（紫色の円）の生成
+    function generateSafeDangerZones(start, goal) {
+        if(!window.turf) return;
+        const startPt = turf.point([start.lng, start.lat]);
+        const goalPt = turf.point([goal.lng, goal.lat]);
+        const midLat = (start.lat + goal.lat) / 2;
+        const midLng = (start.lng + goal.lng) / 2;
+        let createdCount = 0; let tryCount = 0;
+
+        while(createdCount < 2 && tryCount < 100) {
+            tryCount++;
+            const latOffset = (Math.random() - 0.5) * 0.008;
+            const lngOffset = (Math.random() - 0.5) * 0.008;
+            const center = [midLng + lngOffset, midLat + latOffset];
+            const radius = 0.3 + Math.random() * 0.2;
+            const circle = turf.circle(center, radius, {steps: 16, units: 'kilometers'});
+            
+            // スタートとゴールに被らないかチェック
+            const hitStart = turf.booleanPointInPolygon(startPt, circle);
+            const hitGoal = turf.booleanPointInPolygon(goalPt, circle);
+
+            if (!hitStart && !hitGoal) {
+                dangerPolygons.push(circle);
+                L.geoJSON(circle, {
+                    style: { color: 'purple', fillColor: '#8e44ad', fillOpacity: 0.5, weight: 0 }
+                }).addTo(map);
+                createdCount++;
+            }
+        }
+    }
+
+    // マップクリック時の処理
+    function onMapClick(e) {
+        if(isGoalReady) return;
+        
+        // ゴール判定 (半径200m以内)
+        if(map.distance(e.latlng, [goalPoint.lat, goalPoint.lng]) < 200) {
+            userWaypoints.push(L.latLng(goalPoint.lat, goalPoint.lng));
+            drawUserRoute();
+            isGoalReady = true;
+            btnFinish.classList.add('active');
+            btnFinish.textContent = "避難する！（確定）";
+            document.getElementById('status-text').innerHTML = "<b style='color:#27ae60'>ゴール到達！</b><br>ボタンを押して避難完了してください。";
+        } else {
+            userWaypoints.push(e.latlng);
+            L.circleMarker(e.latlng, {radius: 4, color: '#3498db', fillOpacity:1}).addTo(map);
+            drawUserRoute();
+        }
+    }
+
+    // ルート描画
+    function drawUserRoute() {
+        if(userRouteControl) map.removeControl(userRouteControl);
+        userRouteControl = L.Routing.control({
+            waypoints: userWaypoints,
+            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'walking' }),
+            lineOptions: { styles: [{ color: '#3498db', opacity: 0.8, weight: 6 }] },
+            createMarker: () => null, addWaypoints: false, draggableWaypoints: false, show: false
+        }).addTo(map);
+    }
+
+    // 結果判定
+    function judgeGameRoute() {
+        if(!isGoalReady) return;
+        clearInterval(timerInterval);
+        
+        // ルート計算が終わっていない場合の待機
+        if(!userRouteControl._routes || userRouteControl._routes.length === 0) {
+             setTimeout(judgeGameRoute, 500); return;
+        }
+        
+        const route = userRouteControl._routes[0];
+        const coords = route.coordinates;
+        let isDead = false;
+        
+        // ルート上の点が危険区域に入っていないかチェック
+        for(let i=0; i<coords.length; i+=5) {
+            const pt = turf.point([coords[i].lng, coords[i].lat]);
+            for(let poly of dangerPolygons) {
+                if(turf.booleanPointInPolygon(pt, poly)) { isDead = true; break; }
+            }
+            if(isDead) break;
+        }
+        
+        if(isDead) showGameResult("避難失敗…", "ルートが<span class='fail' style='color:#c0392b;font-weight:bold;'>紫色の浸水エリア</span>を通っています。<br>水没してしまいました。", false);
+        else showGameResult("避難成功！", "おめでとうございます！<br>危険箇所を回避し、安全に避難できました。", true);
+    }
+
+    // 結果画面表示
+    function showGameResult(title, desc, isSuccess) {
+        const overlay = document.getElementById('result-overlay');
+        const rTitle = document.getElementById('res-title');
+        const rDesc = document.getElementById('res-desc');
+        overlay.style.display = 'flex';
+        rTitle.innerText = title;
+        rTitle.className = "result-title " + (isSuccess ? "success" : "fail");
+        rDesc.innerHTML = desc;
+    }
+
+    function updateTimer() {
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        document.getElementById('timer-box').textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+    }
+
+    function getDist(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2-lat1)*Math.PI/180;
+        const dLon = (lon2-lon1)*Math.PI/180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // ゲーム内ボタンイベント設定
+    if(btnFinish) btnFinish.addEventListener('click', judgeGameRoute);
+    if(btnRetry) btnRetry.addEventListener('click', resetGameState);
+    if(overlayRetryBtn) overlayRetryBtn.addEventListener('click', resetGameState);
+    if(overlayQuitBtn) overlayQuitBtn.addEventListener('click', () => {
+        stopGameMap(); hideAllScreens(); selectionScreen.classList.remove("hidden");
+    });
 });
+
 
 
 
