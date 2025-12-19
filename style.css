@@ -202,7 +202,6 @@ body.light-theme #current-time-display { background: rgba(0, 0, 0, 0.1); }
     z-index: 2000; /* 他の画面より確実に手前に */
     padding: 0;
     margin: 0;
-    display: block; /* Flexboxを無効化 */
 }
 
 /* hiddenクラスがついている時は消す */
@@ -348,3 +347,4 @@ body.light-theme #current-time-display { background: rgba(0, 0, 0, 0.1); }
     transform: translateX(-25%);
     color: #333 !important;
 }
+
