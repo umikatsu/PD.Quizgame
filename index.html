@@ -8,6 +8,14 @@
     <base href="/PD.Quizgame/">
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer></script>
+    <script src="https://unpkg.com/@turf/turf/turf.min.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -101,11 +109,31 @@
 
     <div id="game-container" class="full-screen-ui hidden">
         <button id="back-from-game-button" class="navigation-button back-button game-back-button">選択画面に戻る</button>
-        <h3>ゲームモード（未実装）</h3>
-        <p>ここはゲームモードのエリアです。</p>
+        
+        <div id="ui-panel">
+            <div id="timer-box">03:00</div>
+            <h2>紫色のエリアを避けろ！</h2>
+            <div id="status-text" class="status-msg">
+                地図をクリックしてルートを作成。<br>ゴールにつなげてください。
+            </div>
+            <button id="btn-finish" class="action-button primary-button" style="width:100%; font-size:1rem; padding:10px;">ここに避難する！</button>
+            <button id="btn-retry" class="action-button" style="width:100%; font-size:1rem; padding:10px; background-color: #7f8c8d;">リセット</button>
+        </div>
+
+        <div id="result-overlay">
+            <div class="result-box">
+                <div id="res-title" class="result-title"></div>
+                <p id="res-desc"></p>
+                <button id="overlay-retry-button" class="action-button primary-button">もう一度遊ぶ</button>
+                <button id="overlay-quit-button" class="action-button">やめる</button>
+            </div>
+        </div>
+
+        <div id="map"></div>
     </div>
 
     <button id="back-to-top-button" class="navigation-button back-button hidden">タイトルに戻る</button>
 
 </body>
+
 </html>
