@@ -556,18 +556,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ゲーム初期化
     function initGameMap() {
+        // ★追加: ゲーム中は右上の時刻表示を隠す
+        const timeDisplay = document.getElementById('current-time-display');
+        if(timeDisplay) timeDisplay.style.display = 'none';
+
         if (!map) {
             map = L.map('map').setView([36.56, 136.65], 14);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
             map.on('click', onMapClick);
         } else {
-            map.invalidateSize(); // 再表示時の崩れ防止
+            // 地図のサイズ崩れを防ぐおまじない
+            setTimeout(() => { map.invalidateSize(); }, 200); 
         }
         resetGameState();
     }
 
     // ゲーム停止（戻るボタン用）
     function stopGameMap() {
+        const timeDisplay = document.getElementById('current-time-display');
+        if(timeDisplay) timeDisplay.style.display = 'block';
         clearInterval(timerInterval);
     }
 
@@ -764,6 +771,7 @@ document.addEventListener("DOMContentLoaded", () => {
         stopGameMap(); hideAllScreens(); selectionScreen.classList.remove("hidden");
     });
 });
+
 
 
 
