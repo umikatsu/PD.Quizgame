@@ -189,81 +189,162 @@ body.light-theme #current-time-display { background: rgba(0, 0, 0, 0.1); }
 /* ================================== */
 /* 6. ゲームモード (マップ) 専用スタイル */
 /* ================================== */
-/* 強制的に全画面表示にする */
+
+/* ゲームコンテナのスタイル */
+/* 注意: HTMLで full-screen-ui クラスを外したので、ここで全画面設定をします */
 #game-container {
-    display: block !important;
-    position: fixed !important;
-    top: 0; left: 0;
-    width: 100vw !important;
-    height: 100vh !important;
-    padding: 0 !important;
-    z-index: 1000;
-    background-color: #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ddd; /* 地図読み込み中の色 */
+    z-index: 2000; /* 他の画面より確実に手前に */
+    padding: 0;
+    margin: 0;
+    display: block; /* Flexboxを無効化 */
 }
 
-/* 地図の高さを強制確保 */
+/* hiddenクラスがついている時は消す */
+#game-container.hidden {
+    display: none;
+}
+
+/* 地図のスタイル */
 #map {
     width: 100%;
-    height: 100vh !important; /* ここが重要 */
+    height: 100%;
     z-index: 1;
 }
 
-/* 操作パネル位置調整 */
-#ui-panel {
-    position: absolute;
-    top: 20px !important;
-    left: 20px !important;
-    z-index: 1500;
-    background: rgba(255, 255, 255, 0.95); padding: 15px;
-    border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    width: 280px; border-left: 6px solid #8e44ad; text-align: left; color: #333;
-}
-#ui-panel * { text-shadow: none !important; color: #333 !important; }
-#ui-panel h2 { color: #8e44ad !important; font-size: 16px; margin: 0 0 5px 0; }
-#ui-panel button { color: #fff !important; margin: 5px 0; }
-
-#timer-box {
-    background: #2c3e50; color: #fff !important; text-align: center;
-    padding: 8px; border-radius: 5px; margin-bottom: 10px;
-    font-size: 20px; font-weight: bold; letter-spacing: 2px;
-}
-.status-msg { font-size: 13px; margin-bottom: 10px; padding: 8px; background: #f3e5f5; border-radius: 4px; color: #333; }
-
-#btn-finish { opacity: 0.5; pointer-events: none; }
-#btn-finish.active { opacity: 1; pointer-events: auto; box-shadow: 0 3px 0 #d35400; }
-
-/* 戻るボタンを右上に配置 */
+/* 戻るボタンを右上に強制配置 */
 #back-from-game-button {
-    top: 20px !important;
-    right: 20px !important;
-    left: auto !important;
-    z-index: 2000;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    left: auto; /* 左寄せ設定を解除 */
+    width: auto;
+    z-index: 3000; /* パネルより手前 */
     background-color: rgba(0, 0, 0, 0.6);
     border: 1px solid #fff;
+    font-size: 14px;
+    padding: 8px 16px;
 }
-#back-from-game-button:hover { background-color: rgba(0, 0, 0, 0.8); }
+#back-from-game-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
 
-/* 結果オーバーレイ */
+/* 操作パネルのスタイル調整 */
+#ui-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2500;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    width: 280px;
+    border-left: 6px solid #8e44ad;
+    text-align: left;
+    color: #333;
+}
+
+/* UIパネル内の文字色を黒に固定 */
+#ui-panel * {
+    text-shadow: none !important;
+    color: #333 !important;
+}
+#ui-panel h2 {
+    color: #8e44ad !important;
+    font-size: 16px;
+    margin: 0 0 5px 0;
+}
+#ui-panel button {
+    color: #fff !important;
+    margin: 5px 0;
+}
+
+/* タイマーのデザイン */
+#timer-box {
+    background: #2c3e50;
+    color: #fff !important;
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.status-msg {
+    font-size: 13px;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #f3e5f5;
+    border-radius: 4px;
+    color: #333;
+}
+
+/* 避難ボタン */
+#btn-finish {
+    opacity: 0.5;
+    pointer-events: none;
+}
+#btn-finish.active {
+    opacity: 1;
+    pointer-events: auto;
+    box-shadow: 0 3px 0 #d35400;
+}
+
+/* 結果画面オーバーレイ */
 #result-overlay {
-    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); z-index: 2000;
-    align-items: center; justify-content: center; flex-direction: column;
+    display: none;
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 4000; /* 最前面 */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
+
 .result-box {
-    background: white; color: #333; padding: 30px; border-radius: 10px;
-    text-align: center; max-width: 90%; width: 400px;
+    background: white;
+    color: #333;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 90%;
+    width: 400px;
 }
-.result-box * { text-shadow: none !important; color: #333; }
-.result-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+.result-box * {
+    text-shadow: none !important;
+    color: #333;
+}
+.result-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
 .result-title.success { color: #27ae60 !important; }
 .result-title.fail { color: #c0392b !important; }
 
-/* Leaflet調整 */
+/* Leafletのパーツ調整 */
 .leaflet-routing-container { display: none !important; }
 .custom-pin { background: transparent; border: none; }
 .pin-label {
-    background: white; border: 2px solid #333; border-radius: 4px;
-    padding: 2px 5px; font-weight: bold; font-size: 11px; white-space: nowrap;
-    position: absolute; top: -30px; left: -50%; transform: translateX(-25%);
+    background: white;
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-weight: bold;
+    font-size: 11px;
+    white-space: nowrap;
+    position: absolute;
+    top: -30px;
+    left: -50%;
+    transform: translateX(-25%);
     color: #333 !important;
 }
