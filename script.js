@@ -591,6 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(btnRetry) btnRetry.addEventListener('click', resetGameState);
     if(overlayRetryBtn) overlayRetryBtn.addEventListener('click', resetGameState);
     if(overlayQuitBtn) overlayQuitBtn.addEventListener('click', () => {
-        stopGameMap(); hideAllScreens(); selectionScreen.classList.remove("hidden");
+        window.location.href = EXIT_URL;
     });
 });
+
