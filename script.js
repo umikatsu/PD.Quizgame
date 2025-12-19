@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const startPersonalityBtn = document.getElementById("start-personality-button");
     const pRestartButton = document.getElementById("p-restart-button");
     const pQuitButton = document.getElementById("p-quit-button");
+    
+    // ゲームモード用ボタン
     const backFromGameBtn = document.getElementById("back-from-game-button");
     const btnFinish = document.getElementById('btn-finish');
     const btnRetry = document.getElementById('btn-retry');
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* ================================== */
-    /* II. 知識クイズ用 DOM 要素と状態変数 (QUIZ) */
+    /* II. 知識クイズ用変数 (QUIZ) */
     /* ================================== */
     let currentQuizIndex = 0;
     let score = 0;
@@ -57,12 +59,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalTotal = document.getElementById('final-total');
     const rankMessage = document.getElementById('rank-message');
 
-    // 複数画像DOM要素を取得
+    // 画像要素
     const quizImageGroup = document.getElementById('quiz-image-group');
     const quizImage1 = document.getElementById('quiz-image-1');
     const quizImage2 = document.getElementById('quiz-image-2');
 
-    // クイズデータ定義
+    // クイズデータ
     const quizzes = [
         {question: "水害時避難する時に履くべき靴はどちらか？", choices: ["長靴", "スニーカー", "サンダル", "ハイヒール"], answer: "スニーカー", explanation: "長靴は浸水時に水が内部に入り、移動しづらくなってしまうため不適切です。ひもで結べて、足底がギザギザした滑りずらいスニーカーが避難時には適切です。", images: []},
         {question: "金沢市が作成している水害ハザードマップに書かれていないものは次のうちどれか？", choices: ["浸水想定区域", "警戒レベルごとに行うべき行動", "土砂災害想定区域", "高潮浸水想定区域図"], answer: "高潮浸水想定区域図", explanation: "水害ハザードマップは大雨により河川が氾濫した場合を想定したものなので、高潮に関する想定区域図はありません。", images: []},
@@ -86,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
         {question: "災害後、「屋根の無料点検」「火災保険で修理できる」などと言って訪問してくる業者の対応として、最も適切な物はどれか？", choices: ["困っているため、すぐに修理契約書にサインする", "「点検だけは無料」と言われたため、とりあえず屋根に上がってもらう", "その場で契約はせず、身分証の確認、工務店や消費生活センターに相談する", "「保険金の請求代行を行う」と言われたため、手数料を前払いして任せる"], answer: "その場で契約はせず、身分証の確認、工務店や消費生活センターに相談する", explanation: "すぐに契約書にサインしたり、屋根に上がってもらうことは悪質業者の手口のため、絶対に行ってはいけません。", images: []},
         {question: "「大規模水害対策」において最も重要とされる考え方として、国土交通省が提言しているものはどれか？", choices: ["すべての洪水は堤防工事で防げる", "施設の能力を超える大洪水は必ず発生すると考え、被害軽減を重視する", "小規模河川は洪水対策の対象内とする", "ハザードマップは大雨時以外でも更新する"], answer: "施設の能力を超える大洪水は必ず発生すると考え、被害軽減を重視する", explanation: "最近の水害対策では堤防や治水施設で防ぐ考え方を見直し、施設の限界を想定した被害軽減策が重要とされています。洪水対策の対象内とハザードマップについての記載は国土交通省が提言していません。", images: []},
         
-        // 問題文から手順リストのテキストを削除済み
         {question: "電気を復旧させるときの手順として正しい並び替えはどれか？ (画像を参照して解答してください)",
           choices: [
               "4→2→3→1", // 正解
@@ -123,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     const NEXT_QUESTION_DELAY = 500;
 
-    // 診断問題データ (Personality)
+    // 診断問題データ
     const pQuestions = [
         {question: "1. 災害時のハザードマップや避難場所を把握していますか？", options: [{ text: "非常に詳しく、家族と共有している", score: 3 }, { text: "だいたいの場所は知っている", score: 2 }, { text: "ほとんど確認したことがない", score: 1 }]},
         {question: "2. 普段からデマや誤情報に惑わされずに、情報源を精査しますか？", options: [{ text: "必ず複数の信頼できる情報源と比較する", score: 3 }, { text: "情報の出所を確認するが、時には鵜呑みにする", score: 2 }, { text: "友人やSNSで流れてきた情報を信じやすい", score: 1 }]},
@@ -137,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {question: "10. あなたが地域のリーダーに任命された場合、どう対応しますか？", options: [{ text: "断固として受け入れ、責任を持って指揮をとる", score: 3 }, { text: "不安はあるが、求められれば協力的に役割を果たす", score: 2 }, { text: "リーダーは苦手なので、断る", score: 1 }]},
     ];
 
-    // 診断結果データ (Personality)
+    // 診断結果データ
     const pResults = [
         { minScore: 26, maxScore: 30, text: "👑 **【即応型リーダータイプ】** 👑\n**傾向予測:** 危険を察知する能力が高く、**即断即決で避難を優先**し、周囲を導けます。パニック時でも冷静さを保ち、困難な状況でも代案を考え実行する**行動力**があります。地域の中心的な役割を担う可能性が高いです。" },
         { minScore: 21, maxScore: 25, text: "🤝 **【協調型バランスタイプ】** 🤝\n**傾向予測:** **情報収集力**と**協調性**のバランスが取れています。情報を精査しつつ、集団行動においては**周囲と協力**し、円滑な避難・避難所生活を支えるでしょう。冷静に状況を見極め、サポート役として貢献します。" },
@@ -145,14 +146,12 @@ document.addEventListener("DOMContentLoaded", () => {
         { minScore: 10, maxScore: 15, text: "⚠️ **【情報依存型慎重タイプ】** ⚠️\n**傾向予測:** 行動に踏み切るまでに時間を要し、**情報の確定を待つ傾向**があります。避難時や集団の中では指示を待つことが多く、積極的な行動は控えめです。信頼できる情報源と、頼れるリーダーの存在が行動の鍵となります。" },
     ];
 
-
     // ボディ全体に適用される要素を取得
     const body = document.body;
 
     /* ================================== */
-    /* IV. リアルタイム時刻表示 & テーマ自動切り替え (同期復活) */
+    /* IV. リアルタイム時刻表示 & テーマ */
     /* ================================== */
-
     function createTimeDisplay() {
         let timeDisplay = document.getElementById('current-time-display');
         if (!timeDisplay) {
@@ -162,57 +161,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return timeDisplay;
     }
-
     const timeDisplayElement = createTimeDisplay();
-
+    
     function updateTimeDisplay() {
         const now = new Date();
         const hour = now.getHours();
         const minute = String(now.getMinutes()).padStart(2, '0');
         timeDisplayElement.textContent = `${hour}:${minute}`;
-
-        // リアルタイムテーマ切り替え
         if (hour >= 6 && hour < 18) {
             body.classList.add('light-theme');
         } else {
             body.classList.remove('light-theme');
         }
     }
-
-    // 初期ロード時に更新し、1分ごとにチェック
     updateTimeDisplay();
     setInterval(updateTimeDisplay, 60000);
 
     /* ================================== */
     /* V. 画面遷移 ロジック */
     /* ================================== */
-
     function hideAllScreens() {
         [topScreen, selectionScreen, quizModeSelectionScreen, quizModeContainer, personalityContainer, gameContainer].forEach(screen => {
             if (screen) screen.classList.add("hidden");
         });
     }
 
-    // A. トップ画面 -> メイン選択画面
-    if (startBtn)
-        startBtn.addEventListener("click", () => {
-            hideAllScreens();
-            selectionScreen.classList.remove("hidden");
-        });
+    if (startBtn) startBtn.addEventListener("click", () => { hideAllScreens(); selectionScreen.classList.remove("hidden"); });
+    if (backFromSelectionToTopBtn) backFromSelectionToTopBtn.addEventListener("click", () => { hideAllScreens(); topScreen.classList.remove("hidden"); });
+    if (modeQuizBtn) modeQuizBtn.addEventListener("click", () => { hideAllScreens(); quizModeSelectionScreen.classList.remove("hidden"); });
 
-    // B. メイン選択画面 -> トップ画面
-    if (backFromSelectionToTopBtn)
-        backFromSelectionToTopBtn.addEventListener("click", () => {
-            hideAllScreens();
-            topScreen.classList.remove("hidden");
-        });
-
-    // C. メイン選択画面 -> クイズ/診断選択画面
-    if (modeQuizBtn)
-        modeQuizBtn.addEventListener("click", () => {
-            hideAllScreens();
-            quizModeSelectionScreen.classList.remove("hidden");
-        });
+    // ゲームモード開始
     if (modeGameBtn) {
         modeGameBtn.addEventListener("click", () => {
             hideAllScreens();
@@ -221,33 +199,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // D. クイズ/診断選択画面 -> メイン選択画面
-    if (backFromQuizSelectionBtn)
-        backFromQuizSelectionBtn.addEventListener("click", () => {
-            hideAllScreens();
-            selectionScreen.classList.remove("hidden");
-        });
+    if (backFromQuizSelectionBtn) backFromQuizSelectionBtn.addEventListener("click", () => { hideAllScreens(); selectionScreen.classList.remove("hidden"); });
 
-    // E. クイズ/診断選択画面 -> 知識クイズ開始
-    if (selectKnowledgeQuizBtn)
-        selectKnowledgeQuizBtn.addEventListener("click", () => {
-            hideAllScreens();
-            quizContainer.classList.add('hidden'); // 問題画面を隠す！
-            quizStartScreen.classList.remove('hidden'); // スタート画面を表示！
-            quizModeContainer.classList.remove("hidden");
-            quizStartScreen.classList.remove('hidden');
-        });
+    if (selectKnowledgeQuizBtn) selectKnowledgeQuizBtn.addEventListener("click", () => {
+        hideAllScreens();
+        quizContainer.classList.add('hidden'); 
+        quizStartScreen.classList.remove('hidden'); 
+        quizModeContainer.classList.remove("hidden");
+        quizStartScreen.classList.remove('hidden');
+    });
 
-    // F. クイズ/診断選択画面 -> 性格診断開始
-    if (selectPersonalityQuizBtn)
-        selectPersonalityQuizBtn.addEventListener("click", () => {
-            hideAllScreens();
-            personalityContainer.classList.remove("hidden");
-            resetPersonalityGame();
-        });
+    if (selectPersonalityQuizBtn) selectPersonalityQuizBtn.addEventListener("click", () => {
+        hideAllScreens();
+        personalityContainer.classList.remove("hidden");
+        resetPersonalityGame();
+    });
 
-    // G. 各モードの戻るボタン -> メイン選択画面
-    [backFromQuizModeBtn, document.getElementById("back-from-game-button"), backFromPersonalityBtn].forEach(btn => {
+    [backFromQuizModeBtn, backFromPersonalityBtn].forEach(btn => {
         if(btn) {
             btn.addEventListener("click", () => {
                 hideAllScreens();
@@ -255,35 +223,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+
+    // ゲームモードから戻る
     if(backFromGameBtn) {
         backFromGameBtn.addEventListener("click", () => {
-            stopGameMap(); // タイマー停止
+            stopGameMap();
             hideAllScreens();
             selectionScreen.classList.remove("hidden");
         });
     }
-    // H. 知識クイズの結果画面からモード選択に戻る (クイズ/診断選択画面へ)
-    if(backToModeSelectionBtn)
-        backToModeSelectionBtn.addEventListener('click', () => {
-            hideAllScreens();
-            quizModeSelectionScreen.classList.remove('hidden');
-        });
 
-    // I. 終了ボタン（共通）
-    const EXIT_URL = "https://umikatsu.github.io/PD.Quizgame/advertise.html"; // 宣伝URL
+    if(backToModeSelectionBtn) backToModeSelectionBtn.addEventListener('click', () => { hideAllScreens(); quizModeSelectionScreen.classList.remove('hidden'); });
+
+    const EXIT_URL = "https://umikatsu.github.io/PD.Quizgame/advertise.html"; 
     [quitGameButton, pQuitButton].forEach(btn => {
         if(btn) {
-            btn.addEventListener('click', () => {
-                window.location.href = EXIT_URL;
-            });
+            btn.addEventListener('click', () => { window.location.href = EXIT_URL; });
         }
     });
 
     /* ================================== */
-    /* VI. 知識クイズ ロジック (QUIZ) */
+    /* VI. 知識クイズ ロジック */
     /* ================================== */
-
-    // 配列をシャッフルする関数 (共通)
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -300,75 +261,41 @@ document.addEventListener("DOMContentLoaded", () => {
              shuffleArray(allQuizzes);
              shuffledQuizzes = allQuizzes.slice(0, QUIZ_COUNT);
         }
-
-        currentQuizIndex = 0;
-        score = 0;
-        scoreDisplay.textContent = score;
-        quizStartScreen.classList.add('hidden');
-        quizContainer.classList.remove('hidden');
+        currentQuizIndex = 0; score = 0; scoreDisplay.textContent = score;
+        quizStartScreen.classList.add('hidden'); quizContainer.classList.remove('hidden');
         displayQuiz();
     }
 
-    /**
-     * 知識クイズの表示ロジック
-     */
     function displayQuiz() {
-        resultMessage.textContent = "";
-        nextButtonContainer.innerHTML = "";
-        if (currentQuizIndex >= shuffledQuizzes.length) {
-            showFinalResult();
-            return;
-        }
+        resultMessage.textContent = ""; nextButtonContainer.innerHTML = "";
+        if (currentQuizIndex >= shuffledQuizzes.length) { showFinalResult(); return; }
         const currentQuiz = shuffledQuizzes[currentQuizIndex];
         
-        // 誤って表示されているリスト要素を探して非表示にする (DOM内の不明なリスト要素への対策)
         const possibleList = quizContainer.querySelector('ul, ol, div.list-container');
-        if(possibleList) {
-            possibleList.style.display = 'none';
-        }
+        if(possibleList) possibleList.style.display = 'none';
 
-        // 問題文を表示（問題タイトルのみ）
         questionElement.innerHTML = currentQuiz.question.replace(/\n/g, '<br>');
 
-        // 複数画像に対応
         if (currentQuiz.images && currentQuiz.images.length > 0) {
             quizImageGroup.classList.remove('hidden');
             quizImage1.src = currentQuiz.images[0] || '';
             quizImage2.src = currentQuiz.images[1] || '';
-
-            // 画像が1枚だけの場合は、2枚目を非表示にする
-            if (!currentQuiz.images[1]) {
-                quizImage2.classList.add('hidden');
-            } else {
-                quizImage2.classList.remove('hidden');
-            }
+            if (!currentQuiz.images[1]) { quizImage2.classList.add('hidden'); } else { quizImage2.classList.remove('hidden'); }
         } else {
-            quizImageGroup.classList.add('hidden');
-            quizImage1.src = '';
-            quizImage2.src = '';
+            quizImageGroup.classList.add('hidden'); quizImage1.src = ''; quizImage2.src = '';
         }
 
         choicesContainer.innerHTML = '';
         const shuffledChoices = shuffleArray([...currentQuiz.choices]);
-
         shuffledChoices.forEach((choice) => {
             const button = document.createElement('button');
-
             button.textContent = choice;
-
-            button.classList.add('choice-button');
-            button.classList.add('action-button');
-
-            button.addEventListener('click', () => {
-                checkAnswer(button, choice, currentQuiz.answer);
-            });
+            button.classList.add('choice-button', 'action-button');
+            button.addEventListener('click', () => { checkAnswer(button, choice, currentQuiz.answer); });
             choicesContainer.appendChild(button);
         });
     }
 
-    /**
-     * 知識クイズの回答チェックロジック
-     */
     function checkAnswer(selectedButton, selectedChoice, correctAnswer) {
         const buttons = choicesContainer.querySelectorAll('.choice-button');
         buttons.forEach(btn => btn.disabled = true);
@@ -376,162 +303,90 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (selectedChoice === correctAnswer) {
             resultMessage.innerHTML = `✅ **正解！** にげまくりまっし！<br><small>【解説】${currentQuiz.explanation}</small>`;
-            selectedButton.classList.add('correct');
-            score++;
+            selectedButton.classList.add('correct'); score++;
         } else {
             resultMessage.innerHTML = `❌ **不正解...** <small>正解は「${currentQuiz.answer}」でした。</small><br><small>【解説】${currentQuiz.explanation}</small>`;
             selectedButton.classList.add('incorrect');
-
-            buttons.forEach(btn => {
-                if (btn.textContent === currentQuiz.answer) {
-                    btn.classList.add('correct');
-                }
-            });
+            buttons.forEach(btn => { if (btn.textContent === currentQuiz.answer) btn.classList.add('correct'); });
         }
 
         scoreDisplay.textContent = score;
         const nextBtn = document.createElement('button');
-        nextBtn.id = 'next-button';
-        nextBtn.classList.add('action-button');
+        nextBtn.id = 'next-button'; nextBtn.classList.add('action-button');
         nextBtn.textContent = (currentQuizIndex + 1) === QUIZ_COUNT ? '結果を見る' : '次へ';
         nextBtn.addEventListener('click', () => {
-            resultMessage.textContent = "";
-            nextButtonContainer.innerHTML = "";
-            currentQuizIndex++;
-            displayQuiz();
+            resultMessage.textContent = ""; nextButtonContainer.innerHTML = "";
+            currentQuizIndex++; displayQuiz();
         });
         nextButtonContainer.appendChild(nextBtn);
     }
 
     function showFinalResult() {
-        quizContainer.classList.add('hidden');
-        quizResultScreen.classList.remove('hidden');
-        finalScore.textContent = score;
-        finalTotal.textContent = QUIZ_COUNT;
+        quizContainer.classList.add('hidden'); quizResultScreen.classList.remove('hidden');
+        finalScore.textContent = score; finalTotal.textContent = QUIZ_COUNT;
         const percentage = (score / QUIZ_COUNT) * 100;
-        if (percentage === 100) {
-            rankMessage.textContent = "🏆 完璧！あなたは防災マスターです！";
-        } else if (percentage >= 70) {
-            rankMessage.textContent = "✨ 素晴らしい！基本的な知識はバッチリです。";
-        } else if (percentage >= 50) {
-            rankMessage.textContent = "💡 まずまずです。さらに知識を深めましょう。";
-        } else {
-            rankMessage.textContent = "😥 要注意！もう一度しっかりと知識を身につけましょう。";
-        }
+        if (percentage === 100) rankMessage.textContent = "🏆 完璧！あなたは防災マスターです！";
+        else if (percentage >= 70) rankMessage.textContent = "✨ 素晴らしい！基本的な知識はバッチリです。";
+        else if (percentage >= 50) rankMessage.textContent = "💡 まずまずです。さらに知識を深めましょう。";
+        else rankMessage.textContent = "😥 要注意！もう一度しっかりと知識を身につけましょう。";
     }
-    if (document.getElementById("start-quiz-button"))
-        document.getElementById("start-quiz-button").addEventListener('click', startQuiz);
-    if(retryQuizBtn)
-        retryQuizBtn.addEventListener('click', () => {
-            quizResultScreen.classList.add('hidden');
-            startQuiz();
-        });
+
+    if (document.getElementById("start-quiz-button")) document.getElementById("start-quiz-button").addEventListener('click', startQuiz);
+    if(retryQuizBtn) retryQuizBtn.addEventListener('click', () => { quizResultScreen.classList.add('hidden'); startQuiz(); });
 
 
     /* ================================== */
-    /* VII. 性格診断 ロジック (PERSONALITY) */
+    /* VII. 性格診断 ロジック */
     /* ================================== */
-
-    // 診断ゲームのリセットと開始
     function resetPersonalityGame() {
-        currentPQuestionIndex = 0;
-        totalPScore = 0;
-        // 問題をシャッフル
+        currentPQuestionIndex = 0; totalPScore = 0;
         shuffleArray(pQuestions);
-
-        pHomeScreen.classList.remove('hidden');
-        pQuestionScreen.classList.add('hidden');
-        pResultScreen.classList.add('hidden');
+        pHomeScreen.classList.remove('hidden'); pQuestionScreen.classList.add('hidden'); pResultScreen.classList.add('hidden');
     }
 
-    // 診断スタートボタンのイベント
-    if (startPersonalityBtn)
-        startPersonalityBtn.addEventListener('click', () => {
-            pHomeScreen.classList.add('hidden');
-            pQuestionScreen.classList.remove('hidden');
-            loadPQuestion();
-        });
+    if (startPersonalityBtn) startPersonalityBtn.addEventListener('click', () => {
+        pHomeScreen.classList.add('hidden'); pQuestionScreen.classList.remove('hidden'); loadPQuestion();
+    });
 
-    // 診断リスタートボタンのイベント
-    if (pRestartButton)
-        pRestartButton.addEventListener('click', () => {
-            resetPersonalityGame();
-        });
+    if (pRestartButton) pRestartButton.addEventListener('click', () => { resetPersonalityGame(); });
 
-    /**
-     * 診断の質問を画面にロードする
-     */
     function loadPQuestion() {
-        if (currentPQuestionIndex >= pQuestions.length) {
-            showPResult();
-            return;
-        }
-
+        if (currentPQuestionIndex >= pQuestions.length) { showPResult(); return; }
         const currentQuestion = pQuestions[currentPQuestionIndex];
-        // 修正: 問題番号 (1., 2., ...) を削除
         let qText = currentQuestion.question.replace(/^\d+\.\s*/, '');
         pQuestionText.textContent = qText;
         pQuestionNumberElement.textContent = `${currentPQuestionIndex + 1} / ${pQuestions.length}`;
-
         pOptionsContainer.innerHTML = '';
-
         const optionsToDisplay = [...currentQuestion.options];
-        // 選択肢をシャッフル
         shuffleArray(optionsToDisplay);
-
-        // 選択肢ボタンを作成
         optionsToDisplay.forEach(option => {
             const button = document.createElement('button');
             button.textContent = option.text;
-            button.classList.add(CLASS_NAMES.OPTION_BUTTON);
-            button.classList.add('action-button');
+            button.classList.add(CLASS_NAMES.OPTION_BUTTON, 'action-button');
             button.dataset.score = option.score;
-
-            button.addEventListener('click', (event) => {
-                handlePAnswer(event.target);
-            });
-
+            button.addEventListener('click', (event) => { handlePAnswer(event.target); });
             pOptionsContainer.appendChild(button);
         });
     }
 
-    /**
-     * 診断の回答処理
-     */
     function handlePAnswer(selectedButton) {
         const score = parseInt(selectedButton.dataset.score);
         totalPScore += score;
-
         pOptionsContainer.querySelectorAll(`.${CLASS_NAMES.OPTION_BUTTON}`).forEach(btn => {
-            btn.disabled = true;
-            if (btn === selectedButton) {
-                btn.classList.add(CLASS_NAMES.SELECTED);
-            }
+            btn.disabled = true; if (btn === selectedButton) btn.classList.add(CLASS_NAMES.SELECTED);
         });
-
-        setTimeout(() => {
-            currentPQuestionIndex++;
-            loadPQuestion();
-        }, NEXT_QUESTION_DELAY);
+        setTimeout(() => { currentPQuestionIndex++; loadPQuestion(); }, NEXT_QUESTION_DELAY);
     }
 
-    /**
-     * 診断結果を表示する
-     */
     function showPResult() {
-        pQuestionScreen.classList.add('hidden');
-        pResultScreen.classList.remove('hidden');
-
+        pQuestionScreen.classList.add('hidden'); pResultScreen.classList.remove('hidden');
         const result = pResults.find(r => totalPScore >= r.minScore && totalPScore <= r.maxScore);
-
-        if (result) {
-            pResultText.innerHTML = result.text.replace(/\n/g, '<br>') + `<p><em>（合計スコア: ${totalPScore}点）</em></p>`;
-        } else {
-            pResultText.textContent = `診断結果が見つかりませんでした。（合計スコア: ${totalPScore}点）`;
-        }
+        if (result) pResultText.innerHTML = result.text.replace(/\n/g, '<br>') + `<p><em>（合計スコア: ${totalPScore}点）</em></p>`;
+        else pResultText.textContent = `診断結果が見つかりませんでした。（合計スコア: ${totalPScore}点）`;
     }
+
     /* ================================== */
-    /* VIII. マップゲーム ロジック (新規追加) */
+    /* VIII. マップゲーム ロジック */
     /* ================================== */
     let map = null;
     let startPoint, goalPoint;
@@ -542,7 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let timeLeft = 180;
     let isGoalReady = false;
 
-    // 避難所データ
     const shelters = [
         { name: "金沢市役所", lat: 36.5611, lng: 136.6566 },
         { name: "泉野小学校", lat: 36.5480, lng: 136.6450 },
@@ -551,12 +405,10 @@ document.addEventListener("DOMContentLoaded", () => {
         { name: "犀川小学校", lat: 36.5400, lng: 136.6600 },
         { name: "金沢駅", lat: 36.5780, lng: 136.6480 }
     ];
-    // 出現範囲
     const AREA = { minLat: 36.530, maxLat: 36.600, minLng: 136.620, maxLng: 136.680 };
 
-    // ゲーム初期化
     function initGameMap() {
-        // ★追加: ゲーム中は右上の時刻表示を隠す
+        // ★時刻を隠す
         const timeDisplay = document.getElementById('current-time-display');
         if(timeDisplay) timeDisplay.style.display = 'none';
 
@@ -565,51 +417,39 @@ document.addEventListener("DOMContentLoaded", () => {
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
             map.on('click', onMapClick);
         } else {
-            // 地図のサイズ崩れを防ぐおまじない
-            setTimeout(() => { map.invalidateSize(); }, 200); 
+            // サイズ再計算
+            setTimeout(() => { map.invalidateSize(); }, 200);
         }
         resetGameState();
     }
 
-    // ゲーム停止（戻るボタン用）
     function stopGameMap() {
+        // ★時刻を戻す
         const timeDisplay = document.getElementById('current-time-display');
         if(timeDisplay) timeDisplay.style.display = 'block';
+
         clearInterval(timerInterval);
     }
 
-    // 状態リセット
     function resetGameState() {
         document.getElementById('result-overlay').style.display = 'none';
-        
-        // 地図上の要素を全削除
         map.eachLayer(l => {
             if(l instanceof L.Marker || l instanceof L.Polygon || l instanceof L.CircleMarker) map.removeLayer(l);
         });
         if(userRouteControl) map.removeControl(userRouteControl);
 
         userWaypoints = []; dangerPolygons = []; isGoalReady = false;
-        
-        btnFinish.classList.remove('active'); 
-        btnFinish.textContent = "ルート作成中...";
+        btnFinish.classList.remove('active'); btnFinish.textContent = "ルート作成中...";
         document.getElementById('status-text').innerHTML = "地図をクリックしてルートを作成。<br>ゴールにつなげてください。";
 
-        clearInterval(timerInterval); 
-        timeLeft = 180; 
-        updateTimer();
+        clearInterval(timerInterval); timeLeft = 180; updateTimer();
 
         setupStartGoal();
-        
-        // スタート・ゴールが決まったら危険区域生成
         if(startPoint && goalPoint) {
             generateSafeDangerZones(startPoint, goalPoint);
             map.fitBounds([[startPoint.lat, startPoint.lng], [goalPoint.lat, goalPoint.lng]], {padding:[80,80]});
-            
-            // スタート地点をルートの起点に
             userWaypoints.push(L.latLng(startPoint.lat, startPoint.lng));
             drawUserRoute();
-            
-            // タイマースタート
             timerInterval = setInterval(() => {
                 timeLeft--; updateTimer();
                 if(timeLeft <= 0) showGameResult("TIME OVER", "逃げ遅れました...", false);
@@ -617,7 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // スタート・ゴール地点の決定
     function setupStartGoal() {
         let found = false;
         const startIcon = L.divIcon({
@@ -636,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const tLng = Math.random() * (AREA.maxLng - AREA.minLng) + AREA.minLng;
             const candidates = shelters.filter(s => {
                 const d = getDist(tLat, tLng, s.lat, s.lng);
-                return d >= 0.8 && d <= 2.5; // 0.8km〜2.5kmの範囲
+                return d >= 0.8 && d <= 2.5;
             });
             if(candidates.length > 0){
                 startPoint = {lat:tLat, lng:tLng};
@@ -650,7 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
         L.marker([goalPoint.lat, goalPoint.lng], {icon: goalIcon}).addTo(map);
     }
 
-    // 危険区域（紫色の円）の生成
     function generateSafeDangerZones(start, goal) {
         if(!window.turf) return;
         const startPt = turf.point([start.lng, start.lat]);
@@ -666,8 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const center = [midLng + lngOffset, midLat + latOffset];
             const radius = 0.3 + Math.random() * 0.2;
             const circle = turf.circle(center, radius, {steps: 16, units: 'kilometers'});
-            
-            // スタートとゴールに被らないかチェック
             const hitStart = turf.booleanPointInPolygon(startPt, circle);
             const hitGoal = turf.booleanPointInPolygon(goalPt, circle);
 
@@ -681,11 +517,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // マップクリック時の処理
     function onMapClick(e) {
         if(isGoalReady) return;
-        
-        // ゴール判定 (半径200m以内)
         if(map.distance(e.latlng, [goalPoint.lat, goalPoint.lng]) < 200) {
             userWaypoints.push(L.latLng(goalPoint.lat, goalPoint.lng));
             drawUserRoute();
@@ -700,7 +533,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ルート描画
     function drawUserRoute() {
         if(userRouteControl) map.removeControl(userRouteControl);
         userRouteControl = L.Routing.control({
@@ -711,21 +543,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }).addTo(map);
     }
 
-    // 結果判定
     function judgeGameRoute() {
         if(!isGoalReady) return;
         clearInterval(timerInterval);
-        
-        // ルート計算が終わっていない場合の待機
         if(!userRouteControl._routes || userRouteControl._routes.length === 0) {
              setTimeout(judgeGameRoute, 500); return;
         }
-        
         const route = userRouteControl._routes[0];
         const coords = route.coordinates;
         let isDead = false;
-        
-        // ルート上の点が危険区域に入っていないかチェック
         for(let i=0; i<coords.length; i+=5) {
             const pt = turf.point([coords[i].lng, coords[i].lat]);
             for(let poly of dangerPolygons) {
@@ -733,12 +559,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if(isDead) break;
         }
-        
         if(isDead) showGameResult("避難失敗…", "ルートが<span class='fail' style='color:#c0392b;font-weight:bold;'>紫色の浸水エリア</span>を通っています。<br>水没してしまいました。", false);
         else showGameResult("避難成功！", "おめでとうございます！<br>危険箇所を回避し、安全に避難できました。", true);
     }
 
-    // 結果画面表示
     function showGameResult(title, desc, isSuccess) {
         const overlay = document.getElementById('result-overlay');
         const rTitle = document.getElementById('res-title');
@@ -763,7 +587,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    // ゲーム内ボタンイベント設定
     if(btnFinish) btnFinish.addEventListener('click', judgeGameRoute);
     if(btnRetry) btnRetry.addEventListener('click', resetGameState);
     if(overlayRetryBtn) overlayRetryBtn.addEventListener('click', resetGameState);
@@ -771,10 +594,3 @@ document.addEventListener("DOMContentLoaded", () => {
         stopGameMap(); hideAllScreens(); selectionScreen.classList.remove("hidden");
     });
 });
-
-
-
-
-
-
-
