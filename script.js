@@ -177,6 +177,11 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTimeDisplay();
     setInterval(updateTimeDisplay, 60000);
 
+    if (window.location.hash === "#selection") {
+    hideAllScreens(); // すべての画面を一度隠す
+    selectionScreen.classList.remove("hidden"); // モード選択画面だけを表示
+    }
+
     /* ================================== */
     /* V. 画面遷移 ロジック */
     /* ================================== */
@@ -594,4 +599,5 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = EXIT_URL;
     });
 });
+
 
