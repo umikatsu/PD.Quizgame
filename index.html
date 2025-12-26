@@ -131,9 +131,42 @@
     </div>
 
     <button id="back-to-top-button" class="navigation-button back-button hidden">タイトルに戻る</button>
+<div id="speed-result" style="position:fixed; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:15px; border:2px solid #333; z-index:9999; font-family:monospace; font-size:14px; max-width:300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <strong>📊 計測中...</strong>
+</div>
 
+<script>
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const [perf] = performance.getEntriesByType("navigation");
+        if (!perf) return;
+
+        const dns  = (perf.domainLookupEnd - perf.domainLookupStart).toFixed(2);
+        const tcp  = (perf.connectEnd - perf.connectStart).toFixed(2);
+        const dom  = (perf.domContentLoadedEventEnd - perf.startTime).toFixed(2);
+        const load = (perf.loadEventEnd - perf.startTime).toFixed(2);
+
+        // ブラウザ名の簡易判定
+        let browser = "不明";
+        const ua = navigator.userAgent;
+        if (ua.includes("Edg")) browser = "Edge";
+        else if (ua.includes("Chrome")) browser = "Chrome系";
+        else if (ua.includes("Firefox")) browser = "Firefox";
+        else if (ua.includes("Safari")) browser = "Safari";
+
+        document.getElementById('speed-result').innerHTML = `
+            <strong>📱 ${browser} 計測結果</strong><hr style="margin:5px 0;">
+            DNS解決: ${dns} ms<br>
+            TCP接続: ${tcp} ms<br>
+            表示開始: ${dom} ms<br>
+            <span style="color:red; font-weight:bold;">完了: ${load} ms</span>
+        `;
+    }, 500); // 描画安定のため0.5秒待機
+});
+</script>
 </body>
 
 </html>
+
 
 
